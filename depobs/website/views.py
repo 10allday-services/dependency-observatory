@@ -18,6 +18,7 @@ from depobs.database import models
 from depobs.util import graph_traversal
 from depobs.util import graph_util
 from depobs.website.celery_tasks import get_celery_tasks
+from depobs.website.decorators import basic_auth_required
 from depobs.worker import scoring
 from depobs.worker import validators
 
@@ -332,6 +333,7 @@ def validate_npm_package_version_query_params() -> Tuple[str, str, str]:
 
 
 @api.route("/scan", methods=["POST"])
+@basic_auth_required(app.config["admin_username"], app.config["admin_password"])
 def scan():
     package_name, package_version, _ = validate_npm_package_version_query_params()
     result: celery.result.AsyncResult = get_celery_tasks().scan_npm_package.delay(
@@ -341,6 +343,7 @@ def scan():
 
 
 @api.route("/build_report_tree", methods=["POST"])
+@basic_auth_required(app.config["admin_username"], app.config["admin_password"])
 def build_report_tree():
     package_name, package_version, _ = validate_npm_package_version_query_params()
     result: celery.result.AsyncResult = get_celery_tasks().build_report_tree.delay(
@@ -350,6 +353,7 @@ def build_report_tree():
 
 
 @api.route("/scan_then_build_report_tree", methods=["POST"])
+@basic_auth_required(app.config["admin_username"], app.config["admin_password"])
 def scan_npm_package_then_build_report_tree():
     package_name, package_version, _ = validate_npm_package_version_query_params()
     result: celery.result.AsyncResult = get_celery_tasks().scan_npm_package_then_build_report_tree.delay(
